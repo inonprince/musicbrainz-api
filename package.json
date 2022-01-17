@@ -44,7 +44,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Borewit/musicbrainz-api.git"
+    "url": "https://github.com/inonprince/musicbrainz-api.git"
   },
   "bugs": {
     "url": "https://github.com/Borewit/musicbrainz-api/issues"
