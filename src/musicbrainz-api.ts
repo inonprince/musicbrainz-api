@@ -406,13 +406,11 @@ export class MusicBrainzApi {
       followRedirect: false,
       ...this.options
     });
-    console.log(JSON.stringify(response.headers, null, 2));
-    console.log(JSON.stringify(response.request._redirect, null, 2));
     if (response.statusCode === HttpStatus.OK)
       throw new Error(`Failed to submit form data`);
     if (response.statusCode === HttpStatus.MOVED_TEMPORARILY) {
-      if (mbid || !response.redirectUrls || !response.redirectUrls.length) return;
-      return response.redirectUrls[0];
+      if (!response.headers || !response.headers.location) return;
+      return response.headers.location;
     }
     throw new Error(`Unexpected status code: ${response.statusCode}`);
   }
