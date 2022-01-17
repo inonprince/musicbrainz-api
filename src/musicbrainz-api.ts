@@ -400,7 +400,7 @@ export class MusicBrainzApi {
     formData.username = this.config.botAccount.username;
     formData.password = this.config.botAccount.password;
     formData.remember_me = 1;
-    const url = `${entity}${mbid ? `${mbid}/edit` : 'create'}`;
+    const url = `${entity}/${mbid ? `${mbid}/edit` : 'create'}`;
     const response: any = await got.post(url, {
       form: formData,
       followRedirect: false,
