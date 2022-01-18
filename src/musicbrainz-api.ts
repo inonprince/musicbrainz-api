@@ -452,22 +452,32 @@ export class MusicBrainzApi {
     formData.remember_me = 1;
     formData['merge.edit_note'] = 'same work';
     
-    const url = `${entity}/merge?returnto=/work/${targetid}`;
+    const url = `${entity}/merge`;
     console.log(url,formData);
-    const response: any = await got.post(url, {
-      form: formData,
-      followRedirect: false,
-      ...this.options
-    });
-    console.log(response.body);
-    
-    if (response.statusCode === HttpStatus.OK)
-      throw new Error(`Failed to submit form data`);
-    if (response.statusCode === HttpStatus.MOVED_TEMPORARILY) {
-      if (!response.headers || !response.headers.location) return;
-      return response.headers.location;
-    }
-    throw new Error(`Unexpected status code: ${response.statusCode}`);
+    let digest: string = null;
+    let n = 1;
+
+    do {
+      await this.rateLimiter.limit();
+      const response: any = await got.post(url, {
+        form: formData,
+        headers: {
+          authorization: digest,
+        },
+        throwHttpErrors: false,
+        ...this.options
+      });
+      console.log(response.body);
+      if (response.statusCode === HttpStatus.UNAUTHORIZED) {
+        // Respond to digest challenge
+        const auth = new DigestAuth(this.config.botAccount);
+        const relPath = Url.parse(response.requestUrl).path; // Ensure path is relative
+        digest = auth.digest(response.request.method, relPath, response.headers['www-authenticate']);
+        ++n;
+      } else {
+        break;
+      }
+    } while (n++ < 5);
   }
 
   /**
