@@ -436,6 +436,7 @@ export class MusicBrainzApi {
       ...this.options
     });
     console.warn(response.body);
+    console.warn(response.request);
     if (response.statusCode === HttpStatus.OK)
       throw new Error(`Failed to submit form data`);
     if (response.statusCode === HttpStatus.MOVED_TEMPORARILY) {
