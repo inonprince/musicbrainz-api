@@ -423,6 +423,8 @@ export class MusicBrainzApi {
    */
   public async mergeEntities(entity: mb.EntityType, targetid: string, mbids: string[]): Promise<void> {
 
+    if (!mbids.includes(targetid)) mbids.push(targetid);
+
     const mergeFormData:Record<string, any> = { 'merge.edit_note': ''};
 
     await this.login()    
@@ -460,6 +462,9 @@ export class MusicBrainzApi {
       ...this.options
     });
     console.warn(response.body);
+    console.warn(response.statusCode);
+    console.warn(response.request);
+    
     if (response.statusCode === HttpStatus.OK)
       throw new Error(`Failed to submit form data`);
     if (response.statusCode === HttpStatus.MOVED_TEMPORARILY) {
