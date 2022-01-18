@@ -422,21 +422,44 @@ export class MusicBrainzApi {
    * @param mbid
    */
   public async mergeEntities(entity: mb.EntityType, targetid: string, mbids: string[]): Promise<void> {
+
+    const mergeFormData:Record<string, any> = { 'merge.edit_note': ''};
+
+    await this.login()    
     await this.rateLimiter.limit();
+    for (const i in mbids) {
+      // getting id from mbid
+      const response: any = await got.get(`ws/js/entity/${mbids[i]}`, {
+        followRedirect: false, // Disable redirects
+        responseType: 'text',
+        ...this.options
+      });
+      const responseJson = JSON.parse(response.body)
+      await this.rateLimiter.limit();
+      if (!responseJson?.id) throw new Error(`cannot find id for work ${mbids[i]}`);
+      await got.get('work/merge_queue', {
+        searchParams: {
+          'add-to-merge': responseJson.id
+        },
+        followRedirect: false,
+        ...this.options
+      });
+      mergeFormData[`merge.merging.${i}`] = `${responseJson.id}`;
+      if (targetid === mbids[i]) {
+        mergeFormData['merge.target'] = `${responseJson.id}`;
+      }
+    }
 
-    await this.login()
-
-    const r = await this.getCookies(this.options.prefixUrl);
-    console.log(r);
+    console.warn(mergeFormData);
     
+
     const url = `${entity}/merge`;
     const response: any = await got.post(url, {
-      body: 'merge.merging.0=2496671&merge.merging.1=7588483&merge.merging.2=7588585&merge.edit_note=',
+      body: queryString.stringify(mergeFormData),
       followRedirect: false,
       ...this.options
     });
     console.warn(response.body);
-    console.warn(response.request);
     if (response.statusCode === HttpStatus.OK)
       throw new Error(`Failed to submit form data`);
     if (response.statusCode === HttpStatus.MOVED_TEMPORARILY) {
