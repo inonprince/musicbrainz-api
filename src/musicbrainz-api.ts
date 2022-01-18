@@ -330,6 +330,9 @@ export class MusicBrainzApi {
     assert.ok(this.config.botAccount.username, 'bot username should be set');
     assert.ok(this.config.botAccount.password, 'bot password should be set');
 
+    const l = await this.getCookies(this.options.prefixUrl);
+    console.log(l);
+
     if (this.session && this.session.loggedIn) {
       for (const cookie of await this.getCookies(this.options.prefixUrl)) {
         if (cookie.key === 'remember_login') {
@@ -357,6 +360,10 @@ export class MusicBrainzApi {
       form: formData,
       ...this.options
     });
+    const r = await this.getCookies(this.options.prefixUrl);
+    console.log(r);
+    
+    
     const success = response.statusCode === HttpStatus.MOVED_TEMPORARILY && response.headers.location === redirectUri;
     if (success) {
       this.session.loggedIn = true;
