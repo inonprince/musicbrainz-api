@@ -21,7 +21,7 @@ import * as tough from 'tough-cookie';
 export * from './musicbrainz.types';
 
 import { promisify } from 'util';
-import qs from 'qs';
+const queryString = require('query-string');
 
 const retries = 3;
 
@@ -462,7 +462,7 @@ export class MusicBrainzApi {
 
       const response: any = await got.post(url, {
         searchParams: { returnto: `/work/${targetid}`},
-        body: qs.stringify(formData),
+        body: queryString.stringify(formData),
         headers: {
           authorization: digest,
         },
