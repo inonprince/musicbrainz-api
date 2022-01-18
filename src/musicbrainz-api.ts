@@ -421,11 +421,11 @@ export class MusicBrainzApi {
    * @param entity Entity type e.g. 'recording'
    * @param mbid
    */
-  public async mergeEntities(entity: mb.EntityType, targetid: string, mbids: string[]): Promise<void> {
+  public async mergeEntities(entity: mb.EntityType, targetid: string, mbids: string[], editNote: string): Promise<void> {
 
     if (!mbids.includes(targetid)) mbids.push(targetid);
 
-    const mergeFormData:Record<string, any> = { 'merge.edit_note': ''};
+    const mergeFormData:Record<string, any> = { 'merge.edit_note': editNote};
 
     await this.login()    
     await this.rateLimiter.limit();
