@@ -457,7 +457,8 @@ export class MusicBrainzApi {
 
     const url = `${entity}/merge`;
     const response: any = await got.post(url, {
-      body: queryString.stringify(mergeFormData),
+      // body: queryString.stringify(mergeFormData),
+      form: mergeFormData,
       followRedirect: false,
       ...this.options
     });
