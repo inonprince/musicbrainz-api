@@ -21,7 +21,6 @@ import * as tough from 'tough-cookie';
 export * from './musicbrainz.types';
 
 import { promisify } from 'util';
-const queryString = require('query-string');
 
 const retries = 3;
 
@@ -444,24 +443,9 @@ export class MusicBrainzApi {
       }
     }
 
-    // this.session = await this.getSession(this.config.baseUrl);
-    // formData.csrf_session_key = this.session.csrf.sessionKey;
-    // formData.csrf_token = this.session.csrf.token;
-    // formData.username = this.config.botAccount.username;
-    // formData.password = this.config.botAccount.password;
-    // formData.remember_me = 1;
     // formData['merge.edit_note'] = 'same work';
     
     const url = `${entity}/merge`;
-    // const response: any = await got.post(url, {
-    //   body: queryString.stringify(formData),
-    //   followRedirect: false,
-    //   ...this.options
-    // });
-    // console.log(response.body);
-    
-
-
     console.log(url,formData);
     let digest: string = null;
     let n = 1;
@@ -477,7 +461,7 @@ export class MusicBrainzApi {
 
       const response: any = await got.post(url, {
         searchParams: { returnto: `/work/${targetid}`},
-        body: queryString.stringify(formData),
+        form: formData,
         headers: {
           authorization: digest,
         },
@@ -487,14 +471,11 @@ export class MusicBrainzApi {
       console.log(response.body);
       if (response.statusCode === HttpStatus.UNAUTHORIZED) {
         // Respond to digest challenge
-        console.warn('retrying');
-        
         const auth = new DigestAuth(this.config.botAccount);
         const relPath = Url.parse(response.requestUrl).path; // Ensure path is relative
         digest = auth.digest(response.request.method, relPath, response.headers['www-authenticate']);
         ++n;
       } else {
-        console.warn('done');
         break;
       }
     } while (n++ < 5);
