@@ -394,7 +394,7 @@ export class MusicBrainzApi {
     await this.rateLimiter.limit();
 
     await this.login();
-    this.session = await this.getSession(this.config.baseUrl);
+    // this.session = await this.getSession(this.config.baseUrl);
     // await this.login()
     const formData: IFormData = {};
     formData.csrf_session_key = this.session.csrf.sessionKey;
