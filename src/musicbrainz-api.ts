@@ -443,6 +443,8 @@ export class MusicBrainzApi {
         formData['merge.target'] = `${responseJson.id}`;
       }
     }
+
+    this.session = await this.getSession(this.config.baseUrl);
     formData.csrf_session_key = this.session.csrf.sessionKey;
     formData.csrf_token = this.session.csrf.token;
     formData.username = this.config.botAccount.username;
@@ -450,7 +452,6 @@ export class MusicBrainzApi {
     formData.remember_me = 1;
     formData['merge.edit_note'] = 'same work';
     
-    this.session = await this.getSession(this.config.baseUrl);
     const url = `${entity}/merge`;
     const response: any = await got.post(url, {
       body: queryString.stringify(formData),
