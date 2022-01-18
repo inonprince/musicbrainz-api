@@ -486,6 +486,8 @@ export class MusicBrainzApi {
       body: queryString.stringify(mergeFormData),
       ...this.options
     });
+    console.warn(111);
+    
     console.warn(response.body);
     
   }
