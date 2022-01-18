@@ -425,10 +425,18 @@ export class MusicBrainzApi {
 
     if (!mbids.includes(targetid)) mbids.push(targetid);
 
-    const mergeFormData:Record<string, any> = { 'merge.edit_note': ''};
+    const mergeFormData:Record<string, any> = { 'merge.edit_note': 'same work'};
 
     await this.login()    
     await this.rateLimiter.limit();
+    const url = `${entity}/merge`;
+    const r: any = await got.post(url, {
+      body: queryString.stringify({ submit: 'cancel' }),
+      followRedirect: false,
+      ...this.options
+    });
+    await this.rateLimiter.limit();
+
     for (const i in mbids) {
       // getting id from mbid
       const response: any = await got.get(`ws/js/entity/${mbids[i]}`, {
@@ -455,10 +463,9 @@ export class MusicBrainzApi {
     console.warn(mergeFormData);
     
 
-    const url = `${entity}/merge`;
+    
     const response: any = await got.post(url, {
-      // body: queryString.stringify(mergeFormData),
-      form: mergeFormData,
+      body: queryString.stringify(mergeFormData),
       followRedirect: false,
       ...this.options
     });
