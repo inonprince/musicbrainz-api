@@ -19,7 +19,6 @@ import got, { Options } from 'got';
 import * as tough from 'tough-cookie';
 
 export * from './musicbrainz.types';
-const queryString = require('query-string');
 
 import { promisify } from 'util';
 
@@ -431,7 +430,6 @@ export class MusicBrainzApi {
     await this.rateLimiter.limit();
     const url = `${entity}/merge`;
     const r: any = await got.post(url, {
-      // body: queryString.stringify({ submit: 'cancel' }),
       form: { submit: 'cancel' },
       followRedirect: false,
       ...this.options
@@ -448,6 +446,7 @@ export class MusicBrainzApi {
       const responseJson = JSON.parse(response.body)
       await this.rateLimiter.limit();
       if (!responseJson?.id) throw new Error(`cannot find id for work ${mbids[i]}`);
+      // adding work to queue
       await got.get('work/merge_queue', {
         searchParams: {
           'add-to-merge': responseJson.id
@@ -461,19 +460,12 @@ export class MusicBrainzApi {
       }
     }
 
-    console.warn(mergeFormData);
-    
-
-    
+    // merging
     const response: any = await got.post(url, {
-      // body: queryString.stringify(mergeFormData),
       form: mergeFormData,
       followRedirect: false,
       ...this.options
     });
-    console.warn(response.body);
-    console.warn(response.statusCode);
-    console.warn(response.request);
     
     if (response.statusCode === HttpStatus.OK)
       throw new Error(`Failed to submit form data`);
