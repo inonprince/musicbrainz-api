@@ -19,6 +19,7 @@ import got, { Options } from 'got';
 import * as tough from 'tough-cookie';
 
 export * from './musicbrainz.types';
+const queryString = require('query-string');
 
 import { promisify } from 'util';
 
@@ -425,6 +426,7 @@ export class MusicBrainzApi {
     if (!mbids.includes(targetid)) mbids.push(targetid);
 
     const formData:Record<string, any> = {};
+    const mergeFormData:Record<string, any> = {};
     
     await this.rateLimiter.limit();
     for (const i in mbids) {
@@ -437,13 +439,13 @@ export class MusicBrainzApi {
       const responseJson = JSON.parse(response.body)
       await this.rateLimiter.limit();
       if (!responseJson?.id) throw new Error(`cannot find id for work ${mbids[i]}`);
-      formData[`merge.merging.${i}`] = `${responseJson.id}`;
+      mergeFormData[`merge.merging.${i}`] = `${responseJson.id}`;
       if (targetid === mbids[i]) {
-        formData['merge.target'] = `${responseJson.id}`;
+        mergeFormData['merge.target'] = `${responseJson.id}`;
       }
     }
 
-    // formData['merge.edit_note'] = 'same work';
+    mergeFormData['merge.edit_note'] = 'same work';
     
     const url = `${entity}/merge`;
     console.log(url,formData);
@@ -479,6 +481,13 @@ export class MusicBrainzApi {
         break;
       }
     } while (n++ < 5);
+    const response: any = await got.post(url, {
+      searchParams: { returnto: `/work/${targetid}`},
+      body: queryString.stringify(formData),
+      ...this.options
+    });
+    console.warn(response.body);
+    
   }
 
   /**
