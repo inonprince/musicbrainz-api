@@ -424,21 +424,9 @@ export class MusicBrainzApi {
 
     if (!mbids.includes(targetid)) mbids.push(targetid);
 
-    await this.rateLimiter.limit();
-
-    this.session = await this.getSession(this.config.baseUrl);
-    // this.session = await this.getSession(this.config.baseUrl);
-    // await this.login()
-    // const formData: IFormData = {};
-
     const formData:Record<string, any> = {};
-
-    formData.csrf_session_key = this.session.csrf.sessionKey;
-    formData.csrf_token = this.session.csrf.token;
-    formData.username = this.config.botAccount.username;
-    formData.password = this.config.botAccount.password;
-    formData.remember_me = 1;
-    formData['merge.edit_note'] = 'same work';
+    
+    await this.rateLimiter.limit();
     for (const i in mbids) {
       // getting id from mbid
       const response: any = await got.get(`ws/js/entity/${mbids[i]}`, {
@@ -455,6 +443,14 @@ export class MusicBrainzApi {
       }
     }
 
+    this.session = await this.getSession(this.config.baseUrl);
+  
+    formData.csrf_session_key = this.session.csrf.sessionKey;
+    formData.csrf_token = this.session.csrf.token;
+    formData.username = this.config.botAccount.username;
+    formData.password = this.config.botAccount.password;
+    formData.remember_me = 1;
+    formData['merge.edit_note'] = 'same work';
     
     const url = `${entity}/merge?returnto=/work/${targetid}`;
     console.log(url,formData);
