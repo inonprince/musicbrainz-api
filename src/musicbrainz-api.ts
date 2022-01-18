@@ -393,8 +393,9 @@ export class MusicBrainzApi {
 
     await this.rateLimiter.limit();
 
-    // this.session = await this.getSession(this.config.baseUrl);
-    await this.login()
+    await this.login();
+    this.session = await this.getSession(this.config.baseUrl);
+    // await this.login()
     const formData: IFormData = {};
     formData.csrf_session_key = this.session.csrf.sessionKey;
     formData.csrf_token = this.session.csrf.token;
@@ -418,9 +419,9 @@ export class MusicBrainzApi {
       }
     }
 
-    console.log(formData);
-
-    const url = `${entity}/merge`;
+    
+    const url = `${entity}/merge?returnto=/work/${targetid}`;
+    console.log(url,formData);
     const response: any = await got.post(url, {
       form: formData,
       followRedirect: false,
