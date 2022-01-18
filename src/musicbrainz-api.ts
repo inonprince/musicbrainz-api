@@ -400,11 +400,24 @@ export class MusicBrainzApi {
     formData.username = this.config.botAccount.username;
     formData.password = this.config.botAccount.password;
     formData.remember_me = 1;
-    formData['merge.target'] = targetid;
     formData['merge.edit_note'] = 'same work';
     for (const i in mbids) {
-      formData[`merge.merging.${i}`] = mbids[i];
+      // /ws/js/entity/65fe50b7-492a-3d5e-91b3-311cf319402c
+      const response: any = await got.get(`ws/js/entity/${mbids[i]}`, {
+        followRedirect: false, // Disable redirects
+        responseType: 'text',
+        ...this.options
+      });
+      const responseJson = response.json();
+      await this.rateLimiter.limit();
+      if (!responseJson?.id) throw new Error(`cannot find id for work ${mbids[i]}`);
+      formData[`merge.merging.${i}`] = responseJson.id;
+      if (targetid === mbids[i]) {
+        formData['merge.target'] = responseJson.id;
+      }
     }
+    console.log(formData);
+    
 
     const url = `${entity}/merge`;
     const response: any = await got.post(url, {
