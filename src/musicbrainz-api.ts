@@ -483,7 +483,7 @@ export class MusicBrainzApi {
     } while (n++ < 5);
     const response: any = await got.post(url, {
       searchParams: { returnto: `/work/${targetid}`},
-      body: queryString.stringify(formData),
+      body: queryString.stringify(mergeFormData),
       ...this.options
     });
     console.warn(response.body);
