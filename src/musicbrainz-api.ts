@@ -382,6 +382,44 @@ export class MusicBrainzApi {
     }
     return success;
   }
+  /**
+   * merge entities
+   * @param entity Entity type e.g. 'recording'
+   * @param mbid
+   */
+  public async mergeEntities(entity: mb.EntityType, targetid: string, mbids: string[]): Promise<void> {
+
+    if (!mbids.includes(targetid)) mbids.push(targetid);
+
+    await this.rateLimiter.limit();
+
+    this.session = await this.getSession(this.config.baseUrl);
+    const formData: IFormData = {};
+    formData.csrf_session_key = this.session.csrf.sessionKey;
+    formData.csrf_token = this.session.csrf.token;
+    formData.username = this.config.botAccount.username;
+    formData.password = this.config.botAccount.password;
+    formData.remember_me = 1;
+    formData['merge.target'] = targetid;
+    formData['merge.edit_note'] = 'same work';
+    for (const i in mbids) {
+      formData[`merge.merging.${i}`] = mbids[i];
+    }
+
+    const url = `${entity}/merge`;
+    const response: any = await got.post(url, {
+      form: formData,
+      followRedirect: false,
+      ...this.options
+    });
+    if (response.statusCode === HttpStatus.OK)
+      throw new Error(`Failed to submit form data`);
+    if (response.statusCode === HttpStatus.MOVED_TEMPORARILY) {
+      if (!response.headers || !response.headers.location) return;
+      return response.headers.location;
+    }
+    throw new Error(`Unexpected status code: ${response.statusCode}`);
+  }
 
   /**
    * Submit entity

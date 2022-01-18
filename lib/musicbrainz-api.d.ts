@@ -108,6 +108,12 @@ export declare class MusicBrainzApi {
      */
     logout(): Promise<boolean>;
     /**
+     * merge entities
+     * @param entity Entity type e.g. 'recording'
+     * @param mbid
+     */
+    mergeEntities(entity: mb.EntityType, targetid: string, mbids: string[]): Promise<void>;
+    /**
      * Submit entity
      * @param entity Entity type e.g. 'recording'
      * @param mbid
