@@ -424,6 +424,7 @@ export class MusicBrainzApi {
   public async mergeEntities(entity: mb.EntityType, targetid: string, mbids: string[]): Promise<void> {
     await this.rateLimiter.limit();
 
+    this.session = await this.getSession(this.config.baseUrl);
     
     const url = `${entity}/merge`;
     const response: any = await got.post(url, {
