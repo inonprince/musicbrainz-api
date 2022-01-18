@@ -397,11 +397,11 @@ export class MusicBrainzApi {
     // this.session = await this.getSession(this.config.baseUrl);
     // await this.login()
     const formData: IFormData = {};
-    formData.csrf_session_key = this.session.csrf.sessionKey;
-    formData.csrf_token = this.session.csrf.token;
-    formData.username = this.config.botAccount.username;
-    formData.password = this.config.botAccount.password;
-    formData.remember_me = 1;
+    // formData.csrf_session_key = this.session.csrf.sessionKey;
+    // formData.csrf_token = this.session.csrf.token;
+    // formData.username = this.config.botAccount.username;
+    // formData.password = this.config.botAccount.password;
+    // formData.remember_me = 1;
     formData['merge.edit_note'] = 'same work';
     for (const i in mbids) {
       // getting id from mbid
@@ -421,7 +421,6 @@ export class MusicBrainzApi {
 
     
     const url = `${entity}/merge?returnto=/work/${targetid}`;
-    console.log(url,formData);
     const response: any = await got.post(url, {
       form: formData,
       followRedirect: false,
