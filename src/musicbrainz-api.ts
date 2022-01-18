@@ -445,14 +445,14 @@ export class MusicBrainzApi {
 
     this.session = await this.getSession(this.config.baseUrl);
   
-    // formData.csrf_session_key = this.session.csrf.sessionKey;
-    // formData.csrf_token = this.session.csrf.token;
-    // formData.username = this.config.botAccount.username;
-    // formData.password = this.config.botAccount.password;
-    // formData.remember_me = 1;
+    formData.csrf_session_key = this.session.csrf.sessionKey;
+    formData.csrf_token = this.session.csrf.token;
+    formData.username = this.config.botAccount.username;
+    formData.password = this.config.botAccount.password;
+    formData.remember_me = 1;
     // formData['merge.edit_note'] = 'same work';
     
-    const url = `${entity}/merge?returnto=/work/${targetid}`;
+    const url = `${entity}/merge`;
     console.log(url,formData);
     let digest: string = null;
     let n = 1;
@@ -460,6 +460,7 @@ export class MusicBrainzApi {
     do {
       await this.rateLimiter.limit();
       const response: any = await got.post(url, {
+        searchParams: { returnto: `/work/${targetid}`},
         form: formData,
         headers: {
           authorization: digest,
