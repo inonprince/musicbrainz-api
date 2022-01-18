@@ -408,7 +408,8 @@ export class MusicBrainzApi {
         responseType: 'text',
         ...this.options
       });
-      const responseJson = response.json();
+      console.warn(response.body);
+      const responseJson = JSON.parse(response.body)
       await this.rateLimiter.limit();
       if (!responseJson?.id) throw new Error(`cannot find id for work ${mbids[i]}`);
       formData[`merge.merging.${i}`] = responseJson.id;
