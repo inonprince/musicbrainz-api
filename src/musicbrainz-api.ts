@@ -425,6 +425,8 @@ export class MusicBrainzApi {
       followRedirect: false,
       ...this.options
     });
+    console.log(response.body);
+    
     if (response.statusCode === HttpStatus.OK)
       throw new Error(`Failed to submit form data`);
     if (response.statusCode === HttpStatus.MOVED_TEMPORARILY) {
