@@ -411,11 +411,13 @@ export class MusicBrainzApi {
       const responseJson = JSON.parse(response.body)
       await this.rateLimiter.limit();
       if (!responseJson?.id) throw new Error(`cannot find id for work ${mbids[i]}`);
-      formData[`merge.merging.${i}`] = responseJson.id;
+      formData[`merge.merging.${i}`] = `${responseJson.id}`;
       if (targetid === mbids[i]) {
-        formData['merge.target'] = responseJson.id;
+        formData['merge.target'] = `${responseJson.id}`;
       }
     }
+
+    console.log(formData);
 
     const url = `${entity}/merge`;
     const response: any = await got.post(url, {
