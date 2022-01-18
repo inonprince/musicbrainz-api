@@ -115,10 +115,10 @@ export declare class MusicBrainzApi {
      */
     editEntity(entity: mb.EntityType, mbid: string, formData: Record<string, any>): Promise<void>;
     /**
-     * merge entities
-     * @param entity Entity type e.g. 'recording'
-     * @param mbid
-     */
+    * merge entities
+    * @param entity Entity type e.g. 'recording'
+    * @param mbid
+    */
     mergeEntities(entity: mb.EntityType, targetid: string, mbids: string[]): Promise<void>;
     /**
      * Set URL to recording
