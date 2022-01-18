@@ -382,60 +382,6 @@ export class MusicBrainzApi {
     }
     return success;
   }
-  /**
-   * merge entities
-   * @param entity Entity type e.g. 'recording'
-   * @param mbid
-   */
-  public async mergeEntities(entity: mb.EntityType, targetid: string, mbids: string[]): Promise<void> {
-
-    if (!mbids.includes(targetid)) mbids.push(targetid);
-
-    await this.rateLimiter.limit();
-
-    await this.login();
-    // this.session = await this.getSession(this.config.baseUrl);
-    // await this.login()
-    const formData: IFormData = {};
-    // formData.csrf_session_key = this.session.csrf.sessionKey;
-    // formData.csrf_token = this.session.csrf.token;
-    // formData.username = this.config.botAccount.username;
-    // formData.password = this.config.botAccount.password;
-    // formData.remember_me = 1;
-    formData['merge.edit_note'] = 'same work';
-    for (const i in mbids) {
-      // getting id from mbid
-      const response: any = await got.get(`ws/js/entity/${mbids[i]}`, {
-        followRedirect: false, // Disable redirects
-        responseType: 'text',
-        ...this.options
-      });
-      const responseJson = JSON.parse(response.body)
-      await this.rateLimiter.limit();
-      if (!responseJson?.id) throw new Error(`cannot find id for work ${mbids[i]}`);
-      formData[`merge.merging.${i}`] = `${responseJson.id}`;
-      if (targetid === mbids[i]) {
-        formData['merge.target'] = `${responseJson.id}`;
-      }
-    }
-
-    
-    const url = `${entity}/merge?returnto=/work/${targetid}`;
-    const response: any = await got.post(url, {
-      form: formData,
-      followRedirect: false,
-      ...this.options
-    });
-    console.log(response.body);
-    
-    if (response.statusCode === HttpStatus.OK)
-      throw new Error(`Failed to submit form data`);
-    if (response.statusCode === HttpStatus.MOVED_TEMPORARILY) {
-      if (!response.headers || !response.headers.location) return;
-      return response.headers.location;
-    }
-    throw new Error(`Unexpected status code: ${response.statusCode}`);
-  }
 
   /**
    * Submit entity
@@ -460,6 +406,65 @@ export class MusicBrainzApi {
       followRedirect: false,
       ...this.options
     });
+    if (response.statusCode === HttpStatus.OK)
+      throw new Error(`Failed to submit form data`);
+    if (response.statusCode === HttpStatus.MOVED_TEMPORARILY) {
+      if (!response.headers || !response.headers.location) return;
+      return response.headers.location;
+    }
+    throw new Error(`Unexpected status code: ${response.statusCode}`);
+  }
+
+  /**
+   * merge entities
+   * @param entity Entity type e.g. 'recording'
+   * @param mbid
+   */
+  public async mergeEntities(entity: mb.EntityType, targetid: string, mbids: string[]): Promise<void> {
+
+    if (!mbids.includes(targetid)) mbids.push(targetid);
+
+    await this.rateLimiter.limit();
+
+    this.session = await this.getSession(this.config.baseUrl);
+    // this.session = await this.getSession(this.config.baseUrl);
+    // await this.login()
+    // const formData: IFormData = {};
+
+    const formData:Record<string, any> = {};
+
+    formData.csrf_session_key = this.session.csrf.sessionKey;
+    formData.csrf_token = this.session.csrf.token;
+    formData.username = this.config.botAccount.username;
+    formData.password = this.config.botAccount.password;
+    formData.remember_me = 1;
+    formData['merge.edit_note'] = 'same work';
+    for (const i in mbids) {
+      // getting id from mbid
+      const response: any = await got.get(`ws/js/entity/${mbids[i]}`, {
+        followRedirect: false, // Disable redirects
+        responseType: 'text',
+        ...this.options
+      });
+      const responseJson = JSON.parse(response.body)
+      await this.rateLimiter.limit();
+      if (!responseJson?.id) throw new Error(`cannot find id for work ${mbids[i]}`);
+      formData[`merge.merging.${i}`] = `${responseJson.id}`;
+      if (targetid === mbids[i]) {
+        formData['merge.target'] = `${responseJson.id}`;
+      }
+    }
+
+    
+    const url = `${entity}/merge?returnto=/work/${targetid}`;
+    console.log(url,formData);
+    const response: any = await got.post(url, {
+      form: formData,
+      followRedirect: false,
+      ...this.options
+    });
+    console.log(response.body);
+    
     if (response.statusCode === HttpStatus.OK)
       throw new Error(`Failed to submit form data`);
     if (response.statusCode === HttpStatus.MOVED_TEMPORARILY) {

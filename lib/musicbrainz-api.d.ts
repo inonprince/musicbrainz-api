@@ -108,18 +108,18 @@ export declare class MusicBrainzApi {
      */
     logout(): Promise<boolean>;
     /**
-     * merge entities
-     * @param entity Entity type e.g. 'recording'
-     * @param mbid
-     */
-    mergeEntities(entity: mb.EntityType, targetid: string, mbids: string[]): Promise<void>;
-    /**
      * Submit entity
      * @param entity Entity type e.g. 'recording'
      * @param mbid
      * @param formData
      */
     editEntity(entity: mb.EntityType, mbid: string, formData: Record<string, any>): Promise<void>;
+    /**
+     * merge entities
+     * @param entity Entity type e.g. 'recording'
+     * @param mbid
+     */
+    mergeEntities(entity: mb.EntityType, targetid: string, mbids: string[]): Promise<void>;
     /**
      * Set URL to recording
      * @param recording Recording to update
