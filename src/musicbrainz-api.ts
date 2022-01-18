@@ -470,7 +470,6 @@ export class MusicBrainzApi {
         throwHttpErrors: false,
         ...this.options
       });
-      console.log(response.body);
       if (response.statusCode === HttpStatus.UNAUTHORIZED) {
         // Respond to digest challenge
         const auth = new DigestAuth(this.config.botAccount);
@@ -481,6 +480,8 @@ export class MusicBrainzApi {
         break;
       }
     } while (n++ < 5);
+    console.warn(mergeFormData);
+    
     const response: any = await got.post(url, {
       searchParams: { returnto: `/work/${targetid}`},
       body: queryString.stringify(mergeFormData),
