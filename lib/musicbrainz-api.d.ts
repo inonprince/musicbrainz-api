@@ -88,7 +88,7 @@ export declare class MusicBrainzApi {
      * Lookup work
      * @param workId Work MBID
      */
-    getWork(workId: string): Promise<mb.IWork>;
+    getWork(workId: string, inc?: Includes[]): Promise<mb.IWork>;
     /**
      * Lookup label
      * @param labelId Label MBID

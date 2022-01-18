@@ -260,8 +260,8 @@ export class MusicBrainzApi {
    * Lookup work
    * @param workId Work MBID
    */
-  public getWork(workId: string): Promise<mb.IWork> {
-    return this.getEntity<mb.IWork>('work', workId);
+  public getWork(workId: string, inc: Includes[] = []): Promise<mb.IWork> {
+    return this.getEntity<mb.IWork>('work', workId, inc);
   }
 
   /**
